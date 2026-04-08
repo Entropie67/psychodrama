@@ -34,7 +34,7 @@ const archetypes = [
   },
   {
     id: 'luzhaoyao',
-    name: '陆昭瑶',
+    name: '路招摇',
     subtitle: 'Lu Zhaoyao',
     origin: '招摇 — Bai Lu',
     archetype: 'La Flamme Démoniaque',
