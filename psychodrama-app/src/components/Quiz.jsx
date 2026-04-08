@@ -1,11 +1,33 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import questions from '../data/questions';
+import { useLang } from '../LangContext';
+import translations from '../data/i18n';
+import questionsFr from '../data/questions';
+import questionsCn from '../data/questions_cn';
 import { computeScores, matchArchetypes } from '../utils/scoring';
 import Question from './Question';
 import ProgressBar from './ProgressBar';
 
 export default function Quiz({ onComplete }) {
+  const lang = useLang();
+  const t = translations[lang];
+
+  // Merge: use FR data for scoring (effects), CN data for display text
+  const questions = useMemo(() => {
+    if (lang === 'fr') return questionsFr;
+    return questionsFr.map((qFr, i) => {
+      const qCn = questionsCn[i];
+      return {
+        ...qFr,
+        text: qCn.text,
+        choices: qFr.choices.map((c, j) => ({
+          ...c,
+          text: qCn.choices[j].text,
+        })),
+      };
+    });
+  }, [lang]);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState(Array(questions.length).fill(null));
 
@@ -19,7 +41,7 @@ export default function Quiz({ onComplete }) {
         setCurrentIndex(currentIndex + 1);
       }
     }, 300);
-  }, [answers, currentIndex]);
+  }, [answers, currentIndex, questions]);
 
   const handlePrevious = () => {
     if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
@@ -34,6 +56,7 @@ export default function Quiz({ onComplete }) {
   const isLastQuestion = currentIndex === questions.length - 1;
   const allAnswered = answers.every((a) => a !== null);
   const currentAnswered = answers[currentIndex] !== null;
+  const fontClass = lang === 'cn' ? 'font-cjk' : 'font-body';
 
   return (
     <motion.div
@@ -53,11 +76,11 @@ export default function Quiz({ onComplete }) {
         {currentIndex > 0 && (
           <button
             onClick={handlePrevious}
-            className="px-6 py-2 text-parchment/40 hover:text-parchment/70 font-body text-sm
+            className={`px-6 py-2 text-parchment/40 hover:text-parchment/70 text-sm
                        border border-parchment/10 hover:border-parchment/30 transition-colors cursor-pointer
-                       focus:outline-none focus:ring-1 focus:ring-gold/30"
+                       focus:outline-none focus:ring-1 focus:ring-gold/30 ${fontClass}`}
           >
-            ← Précédent
+            {t.previous}
           </button>
         )}
 
@@ -68,22 +91,22 @@ export default function Quiz({ onComplete }) {
             whileHover={{ scale: 1.05, boxShadow: '0 0 25px rgba(139, 0, 0, 0.3)' }}
             whileTap={{ scale: 0.95 }}
             onClick={handleFinish}
-            className="px-10 py-3 border border-gold/50 bg-blood/15 text-gold font-display
+            className={`px-10 py-3 border border-gold/50 bg-blood/15 text-gold
                        tracking-widest uppercase text-sm hover:bg-blood/25 transition-colors cursor-pointer
-                       focus:outline-none focus:ring-2 focus:ring-gold/50"
+                       focus:outline-none focus:ring-2 focus:ring-gold/50 ${lang === 'cn' ? 'font-cjk' : 'font-display'}`}
           >
-            Révéler mon Archétype
+            {t.reveal}
           </motion.button>
         )}
 
         {!isLastQuestion && currentAnswered && (
           <button
             onClick={() => setCurrentIndex(currentIndex + 1)}
-            className="px-6 py-2 text-parchment/50 hover:text-gold font-body text-sm
+            className={`px-6 py-2 text-parchment/50 hover:text-gold text-sm
                        border border-parchment/15 hover:border-gold/40 transition-colors cursor-pointer
-                       focus:outline-none focus:ring-1 focus:ring-gold/30"
+                       focus:outline-none focus:ring-1 focus:ring-gold/30 ${fontClass}`}
           >
-            Suivant →
+            {t.next}
           </button>
         )}
       </div>

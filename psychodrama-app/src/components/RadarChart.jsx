@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { axisLabels } from '../data/archetypes';
+import { useLang } from '../LangContext';
+import translations from '../data/i18n';
 
 const AXES = ['feu', 'pouvoir', 'social', 'morale', 'conflit', 'vulnerabilite'];
 const SIZE = 300;
@@ -16,6 +17,8 @@ function polarToCartesian(angle, radius) {
 }
 
 export default function RadarChart({ scores }) {
+  const lang = useLang();
+  const axisLabels = translations[lang].axes;
   const angleStep = 360 / AXES.length;
 
   const gridLines = [];
@@ -60,7 +63,7 @@ export default function RadarChart({ scores }) {
         y={p.y}
         textAnchor="middle"
         dominantBaseline="middle"
-        className="fill-parchment/50 text-[9px] font-body"
+        className={`fill-parchment/50 text-[9px] ${lang === 'cn' ? 'font-cjk' : 'font-body'}`}
       >
         {axisLabels[axis]}
       </text>

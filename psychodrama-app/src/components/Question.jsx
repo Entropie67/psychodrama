@@ -1,6 +1,10 @@
 import { motion } from 'framer-motion';
+import { useLang } from '../LangContext';
 
 export default function Question({ question, onAnswer, selectedAnswer }) {
+  const lang = useLang();
+  const fontClass = lang === 'cn' ? 'font-cjk' : '';
+
   return (
     <motion.div
       key={question.id}
@@ -9,7 +13,7 @@ export default function Question({ question, onAnswer, selectedAnswer }) {
       transition={{ duration: 0.35 }}
       className="w-full max-w-2xl mx-auto"
     >
-      <h2 className="font-display text-xl md:text-2xl text-parchment leading-relaxed mb-8 text-center">
+      <h2 className={`text-xl md:text-2xl text-parchment leading-relaxed mb-8 text-center ${lang === 'cn' ? 'font-cjk' : 'font-display'}`}>
         {question.text}
       </h2>
 
@@ -26,7 +30,7 @@ export default function Question({ question, onAnswer, selectedAnswer }) {
               whileTap={{ scale: 0.98 }}
               onClick={() => onAnswer(index)}
               className={`w-full text-left px-6 py-4 border transition-all duration-200 cursor-pointer
-                         font-body text-sm md:text-base leading-relaxed
+                         text-sm md:text-base leading-relaxed ${fontClass}
                          focus:outline-none focus:ring-1 focus:ring-gold/40
                          ${isSelected
                            ? 'border-gold/60 bg-blood/20 text-gold'

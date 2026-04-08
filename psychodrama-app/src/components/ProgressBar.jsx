@@ -1,12 +1,20 @@
 import { motion } from 'framer-motion';
+import { useLang } from '../LangContext';
+import translations from '../data/i18n';
 
 export default function ProgressBar({ current, total }) {
+  const lang = useLang();
+  const t = translations[lang];
   const progress = ((current + 1) / total) * 100;
 
   return (
     <div className="w-full max-w-xl mx-auto mb-8">
-      <div className="flex justify-between text-parchment/40 text-xs font-body mb-2 tracking-wider">
-        <span>Question {current + 1} / {total}</span>
+      <div className={`flex justify-between text-parchment/40 text-xs mb-2 tracking-wider ${lang === 'cn' ? 'font-cjk' : 'font-body'}`}>
+        <span>
+          {lang === 'cn'
+            ? `${t.questionLabel} ${current + 1} ${t.progressOf} ${total} 题`
+            : `${t.questionLabel} ${current + 1} ${t.progressOf} ${total}`}
+        </span>
         <span>{Math.round(progress)}%</span>
       </div>
       <div className="w-full h-[2px] bg-parchment/10 relative overflow-hidden">
