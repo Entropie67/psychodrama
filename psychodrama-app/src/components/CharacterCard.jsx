@@ -1,12 +1,16 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useLang } from '../LangContext';
 import translations from '../data/i18n';
 import archetypesCn from '../data/archetypes_cn';
 
+const IMAGE_EXTENSIONS = ['png', 'webp', 'jpg'];
+
 export default function CharacterCard({ match, role, delay = 0 }) {
   const lang = useLang();
   const t = translations[lang];
   const { archetype } = match;
+  const [imgError, setImgError] = useState(false);
 
   const cnData = lang === 'cn' ? archetypesCn[archetype.id] : null;
   const displayArchetype = cnData ? cnData.archetype : archetype.archetype;
@@ -46,23 +50,38 @@ export default function CharacterCard({ match, role, delay = 0 }) {
         )}
       </div>
 
-      {/* Placeholder image */}
+      {/* Character image */}
       <div className="relative w-full aspect-[3/2] mb-6 overflow-hidden">
-        <div
-          className={`absolute inset-0 ${
-            role === 'antagoniste'
-              ? 'bg-gradient-to-b from-blood/20 via-abyss to-abyss'
-              : 'bg-gradient-to-b from-gold/10 via-abyss to-abyss'
-          }`}
-        />
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="font-cjk text-3xl md:text-4xl text-parchment/20">
-            {archetype.name}
-          </span>
-          {archetype.subtitle && (
-            <span className="font-body text-sm text-parchment/15 mt-1">{archetype.subtitle}</span>
-          )}
-        </div>
+        {!imgError ? (
+          <img
+            src={`/images/${archetype.id}.png`}
+            alt={archetype.name}
+            onError={() => setImgError(true)}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div
+            className={`absolute inset-0 ${
+              role === 'antagoniste'
+                ? 'bg-gradient-to-b from-blood/20 via-abyss to-abyss'
+                : 'bg-gradient-to-b from-gold/10 via-abyss to-abyss'
+            }`}
+          />
+        )}
+        {/* Vignette overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-abyss via-transparent to-transparent" />
+        {/* Name overlay (placeholder or on top of image) */}
+        {imgError && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="font-cjk text-3xl md:text-4xl text-parchment/20">
+              {archetype.name}
+            </span>
+            {archetype.subtitle && (
+              <span className="font-body text-sm text-parchment/15 mt-1">{archetype.subtitle}</span>
+            )}
+          </div>
+        )}
+        {/* Ornamental border */}
         <div className={`absolute inset-0 border ${role === 'principal' ? 'border-gold/20' : 'border-parchment/10'}`} />
         <div className="absolute inset-2 border border-parchment/5" />
       </div>
